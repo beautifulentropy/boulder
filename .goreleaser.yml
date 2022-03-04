@@ -1,287 +1,74 @@
-builds:
-  - &build
-    id: admin-revoker
-    main: ./cmd/admin-revoker
-    binary: admin-revoker
-    goarch:
-        - amd64
-    env:
-        - CGO_ENABLED=0
-    goos:
-        - linux
-    ldflags:
-      - -X "github.com/letsencrypt/boulder/core.BuildID={{ .ShortCommit }}"
-      - -X "github.com/letsencrypt/boulder/core.BuildHost={{ .Env.USER }}@{{ .Env.HOSTNAME }}"
-      - -X "github.com/letsencrypt/boulder/core.BuildTime={{ .Date }}"
+# If you install goreleaser you can validate this configuration with:
+# 'goreleaser check -f .goreleaser.yml'
 
-  - <<: *build
-    id: akamai-purger
-    main: ./cmd/akamai-purger
-    binary: akamai-purger
+# https://goreleaser.com/customization/changelog
+changelog:
+  # Disable posting of the changelog.
+  skip: true
 
-  - <<: *build
-    id: bad-key-revoker
-    main: ./cmd/bad-key-revoker
-    binary: bad-key-revoker
+checksum:
+  # Tag will always be v.0.0.0 so we provide a name template to achieve the
+  # desired format.
+  name_template: boulder-release-{{ time "2006-01-02"  }}-checksum.txt
 
-  - <<: *build
-    id: boulder-ca
-    main: ./cmd/boulder-ca
-    binary: boulder-ca
-    env:
-      - CGO_ENABLED=1
+# https://goreleaser.com/customization/archive
+# Each item in the archives list is interpreted as a separate archive to be
+# generatated. If you encounter something like "invalid config: found 2 archives
+# with the ID 'default', please fix your config" you've added a new entry to
+# this list (likely on accident).
+archives:
+    # Version will always be 1.0.0 so we provide a name template to achieve the
+    # desired format.
+  - name_template: boulder-release-{{ time "2006-01-02" }}-{{ .ShortCommit }}-{{ .Os }}-{{ .Arch }}
+    replacements:
+      amd64: x86_64
 
-  - <<: *build
-    id: boulder-observer
-    main: ./cmd/boulder-observer
-    binary: boulder-observer
-
-  - <<: *build
-    id: boulder-publisher
-    main: ./cmd/boulder-publisher
-    binary: boulder-publisher
-    env:
-      - CGO_ENABLED=1
-
-  - <<: *build
-    id: boulder-ra
-    main: ./cmd/boulder-ra
-    binary: boulder-ra
-    env:
-      - CGO_ENABLED=1
-
-  - <<: *build
-    id: boulder-sa
-    main: ./cmd/boulder-sa
-    binary: boulder-sa
-
-  - <<: *build
-    id: boulder-va
-    main: ./cmd/boulder-va
-    binary: boulder-va
-
-  - <<: *build
-    id: boulder-wfe
-    main: ./cmd/boulder-wfe
-    binary: boulder-wfe
-    env:
-      - CGO_ENABLED=1
-
-  - <<: *build
-    id: boulder-wfe2
-    main: ./cmd/boulder-wfe2
-    binary: boulder-wfe2
-    env:
-      - CGO_ENABLED=1
-
-  - <<: *build
-    id: caa-log-checker
-    main: ./cmd/caa-log-checker
-    binary: caa-log-checker
-
-  - <<: *build
-    id: ceremony
-    main: ./cmd/ceremony
-    binary: ceremony
-    env:
-      - CGO_ENABLED=1
-
-  - <<: *build
-    id: cert-checker
-    main: ./cmd/cert-checker
-    binary: cert-checker
-
-  - <<: *build
-    id: contact-auditor
-    main: ./cmd/contact-auditor
-    binary: contact-auditor
-
-  - <<: *build
-    id: expiration-mailer
-    main: ./cmd/expiration-mailer
-    binary: expiration-mailer
-
-  - <<: *build
-    id: id-exporter
-    main: ./cmd/id-exporter
-    binary: id-exporter
-
-  - <<: *build
-    id: log-validator
-    main: ./cmd/log-validator
-    binary: log-validator
-
-  - <<: *build
-    id: nonce-service
-    main: ./cmd/nonce-service
-    binary: nonce-service
-
-  - <<: *build
-    id: notify-mailer
-    main: ./cmd/notify-mailer
-    binary: notify-mailer
-
-  - <<: *build
-    id: ocsp-responder
-    main: ./cmd/ocsp-responder
-    binary: ocsp-responder
-    env:
-      - CGO_ENABLED=1
-
-  - <<: *build
-    id: ocsp-updater
-    main: ./cmd/ocsp-updater
-    binary: ocsp-updater
-
-  - <<: *build
-    id: orphan-finder
-    main: ./cmd/orphan-finder
-    binary: orphan-finder
-    env:
-      - CGO_ENABLED=1
-
+# https://goreleaser.com/customization/nfpm
 nfpms:
-  - &nfpm
-    id: admin-revoker-package
-    package_name: boulder-admin-revoker
+  - id: boulder-nfpm
     builds:
-      - admin-revoker
-    formats:
-      - rpm
-      - deb
-    bindir: /opt/boulder/bin
-    maintainer: Boulder <boulder@letsencrypt.org>
+      - boulder
+    file_name_template: boulder-release-{{ time "2006-01-02" }}-1.0.0-{{ .ShortCommit }}-{{ .Os }}-{{ .Arch }}
+    package_name: boulder
+    maintainer: Community
     vendor: ISRG
-    homepage: https://letsencrypt.org/
+    homepage: https://github.com/letsencrypt/boulder
+    description: "Boulder is an ACME-compatible X.509 Certificate Authority"
+    license: "Mozilla Public License v2.0"
+    replacements:
+      amd64: x86_64
+    formats:
+      - deb
+    epoch: "1"
+    bindir: /opt/boulder
+    contents:
+      - src: /opt/boulder/boulder
+        dst: /opt/boulder/boulder-va
+        type: "symlink"
+    
 
-  - <<: *nfpm
-    id: akamai-purger-package
-    package_name: boulder-akamai-purger
-    builds:
-      - akamai-purger
-
-  - <<: *nfpm
-    id: bad-key-revoker-package
-    package_name: boulder-bad-key-revoker
-    builds:
-      - bad-key-revoker
-
-  - <<: *nfpm
-    id: boulder-ca-package
-    package_name: boulder-ca
-    builds:
-      - boulder-ca
-
-  - <<: *nfpm
-    id: boulder-observer-package
-    package_name: boulder-observer
-    builds:
-      - boulder-observer
-
-  - <<: *nfpm
-    id: boulder-publisher-package
-    package_name: boulder-publisher
-    builds:
-      - boulder-publisher
-
-  - <<: *nfpm
-    id: boulder-ra-package
-    package_name: boulder-ra
-    builds:
-      - boulder-ra
-
-  - <<: *nfpm
-    id: boulder-sa-package
-    package_name: boulder-sa
-    builds:
-      - boulder-sa
-
-  - <<: *nfpm
-    id: boulder-va-package
-    package_name: boulder-va
-    builds:
-      - boulder-va
-
-  - <<: *nfpm
-    id: boulder-wfe-package
-    package_name: boulder-wfe
-    builds:
-      - boulder-wfe
-
-  - <<: *nfpm
-    id: boulder-wfe2-package
-    package_name: boulder-wfe2
-    builds:
-      - boulder-wfe2
-
-  - <<: *nfpm
-    id: caa-log-checker-package
-    package_name: boulder-caa-log-checker
-    builds:
-      - caa-log-checker
-
-  - <<: *nfpm
-    id: ceremony-package
-    package_name: boulder-ceremony
-    builds:
-      - ceremony
-
-  - <<: *nfpm
-    id: cert-checker-package
-    package_name: boulder-cert-checker
-    builds:
-      - cert-checker
-
-  - <<: *nfpm
-    id: contact-auditor-package
-    package_name: boulder-contact-auditor
-    builds:
-      - contact-auditor
-
-  - <<: *nfpm
-    id: expiration-mailer-package
-    package_name: boulder-expiration-mailer
-    builds:
-      - expiration-mailer
-
-  - <<: *nfpm
-    id: id-exporter-package
-    package_name: boulder-id-exporter
-    builds:
-      - id-exporter
-
-  - <<: *nfpm
-    id: log-validator-package
-    package_name: boulder-log-validator
-    builds:
-      - log-validator
-
-  - <<: *nfpm
-    id: nonce-service-package
-    package_name: boulder-nonce-service
-    builds:
-      - nonce-service
-
-  - <<: *nfpm
-    id: notify-mailer-package
-    package_name: boulder-notify-mailer
-    builds:
-      - notify-mailer
-
-  - <<: *nfpm
-    id: ocsp-responder-package
-    package_name: boulder-ocsp-responder
-    builds:
-      - ocsp-responder
-
-  - <<: *nfpm
-    id: ocsp-updater-package
-    package_name: boulder-ocsp-updater
-    builds:
-      - ocsp-updater
-
-  - <<: *nfpm
-    id: orphan-finder-package
-    package_name: boulder-orphan-finder
-    builds:
-      - orphan-finder
+# https://goreleaser.com/customization/build
+builds:
+  - &opts
+    id: boulder
+    main: ./cmd/boulder
+    binary: "boulder"
+    env:
+      - GO111MODULE=on
+      - CGO_ENABLED=1
+      - GOFLAGS=-mod=vendor
+      - GOBIN=./bin
+    goos:
+      - linux
+    goarch:
+      - amd64
+    ldflags:
+      # Env.HOSTNAME is not populated by GitHub Actions Runners
+      - -X "github.com/letsencrypt/boulder/core.BuildHost={{ .Env.USER }}@github-actions-runner"
+      - -X "github.com/letsencrypt/boulder/core.BuildID={{ .ShortCommit }}"
+      - -X "github.com/letsencrypt/boulder/core.BuildTime={{ .Date }}"
+  
+  - <<: *opts
+    id: ct-test-srv
+    main: ./test/ct-test-srv
+    binary: "ct-test-srv"

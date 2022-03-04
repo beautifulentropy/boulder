@@ -6,7 +6,7 @@ VERSION ?= 1.0.0
 EPOCH ?= 1
 MAINTAINER ?= "Community"
 
-CMDS = $(shell find ./cmd -maxdepth 1 -mindepth 1 -type d | grep -v testdata)
+CMDS = $(shell `"${BINDIR}/boulder" --list`)
 CMD_BASENAMES = $(shell echo $(CMDS) | xargs -n1 basename)
 CMD_BINS = $(addprefix bin/, $(CMD_BASENAMES) )
 OBJECTS = $(CMD_BINS)
