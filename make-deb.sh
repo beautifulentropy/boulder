@@ -1,13 +1,29 @@
 #!/usr/bin/env bash
 
-apt-get install -y --no-install-recommends \
+#
+# Setup Dependencies
+#
+
+sudo apt-get install -y --no-install-recommends \
   ruby \
   ruby-dev \
   gcc
 
-gem install --no-document fpm
+# Download and unpack our production go version.
+GO_VERSION=$(cat docker-compose.yml | grep "TAG:-" | sed 's/.*-go//' | sed 's/_.*//')
+wget -O go.tgz "https://dl.google.com/go/go${GO_VERSION}.linux.tar.gz"
+sudo tar -C /usr/local -xzf go.tgz
+rm go.tgz
 
+# Install fpm, this is used in our Makefile to package boulder as a deb or rpm.
+sudo gem install --no-document fpm
+
+#
+# Build and Release
+#
+
+# Set $ARCHIVEDIR to our current directory. If left unset our Makefile will set
+# it to /tmp.
 export ARCHIVEDIR="${PWD}"
-
 go version
 make deb
