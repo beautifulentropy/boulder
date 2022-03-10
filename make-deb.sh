@@ -12,7 +12,7 @@ sudo apt-get install -y --no-install-recommends \
 # Download and unpack our production go version.
 GO_VERSION=$(cat docker-compose.yml | grep "TAG:-" | sed 's/.*-go//' | sed 's/_.*//')
 wget -O go.tgz "https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz"
-sudo tar -C /usr/local -xzf go.tgz
+sudo tar -C /usr/bin -xzf go.tgz
 rm go.tgz
 
 # Install fpm, this is used in our Makefile to package boulder as a deb or rpm.
