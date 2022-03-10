@@ -11,7 +11,7 @@ sudo apt-get install -y --no-install-recommends \
 
 # Download and unpack our production go version.
 GO_VERSION=$(cat docker-compose.yml | grep "TAG:-" | sed 's/.*-go//' | sed 's/_.*//')
-wget -O go.tgz "https://dl.google.com/go/go${GO_VERSION}.linux.tar.gz"
+wget -O go.tgz "https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz"
 sudo tar -C /usr/local -xzf go.tgz
 rm go.tgz
 
@@ -25,5 +25,5 @@ sudo gem install --no-document fpm
 # Set $ARCHIVEDIR to our current directory. If left unset our Makefile will set
 # it to /tmp.
 export ARCHIVEDIR="${PWD}"
-go version
+which go
 make deb
