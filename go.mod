@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/aws/aws-sdk-go-v2 v1.17.3
 	github.com/aws/aws-sdk-go-v2/config v1.17.1
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.30.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.30.1
 	github.com/aws/smithy-go v1.13.5
 	github.com/beeker1121/goque v1.0.3-0.20191103205551-d618510128af
 	github.com/eggsampler/acme/v3 v3.3.0
