@@ -1,3 +1,34 @@
+# v1.34.0 (2023-06-13)
+
+* **Feature**: Integrate double encryption feature to SDKs.
+* **Bug Fix**: Fix HeadObject to return types.Nound when an object does not exist. Fixes [2084](https://github.com/aws/aws-sdk-go-v2/issues/2084)
+* **Dependency Update**: Updated to the latest SDK module versions
+
+# v1.33.1 (2023-05-04)
+
+* **Documentation**: Documentation updates for Amazon S3
+
+# v1.33.0 (2023-04-24)
+
+* **Feature**: added custom paginators for listMultipartUploads and ListObjectVersions
+* **Dependency Update**: Updated to the latest SDK module versions
+
+# v1.32.0 (2023-04-19)
+
+* **Feature**: Provides support for "Snow" Storage class.
+
+# v1.31.3 (2023-04-10)
+
+* No change notes available for this release.
+
+# v1.31.2 (2023-04-07)
+
+* **Dependency Update**: Updated to the latest SDK module versions
+
+# v1.31.1 (2023-03-31)
+
+* **Documentation**: Documentation updates for Amazon S3
+
 # v1.31.0 (2023-03-21)
 
 * **Feature**: port v1 sdk 100-continue http header customization for s3 PutObject/UploadPart request and enable user config
